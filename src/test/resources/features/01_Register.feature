@@ -31,3 +31,4 @@ Feature: Registro de usuarios en la plataforma Agrotrace
   Scenario: Registro exitoso de una persona
     When Se registra como "persona" con datos válidos
     Then Ve la lista de cosechas disponibles en la plataforma
+    And Cierra sesión

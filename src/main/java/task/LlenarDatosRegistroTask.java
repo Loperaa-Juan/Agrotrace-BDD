@@ -33,7 +33,6 @@ public class LlenarDatosRegistroTask implements Task {
         escribir(actor, usuario.getContrasena(), INPUT_CONTRASENA);
         escribir(actor, usuario.getDireccion(), INPUT_DIRECCION);
         escribir(actor, usuario.getMunicipio(), INPUT_MUNICIPIO);
-
     }
 
     private boolean tieneValor(String valor) {

@@ -15,7 +15,6 @@ import static net.serenitybdd.screenplay.matchers.WebElementStateMatchers.contai
 import static net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isPresent;
 import static org.hamcrest.CoreMatchers.equalTo;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import models.DatosUsuarios;
 import models.UsuarioRegistro;
@@ -104,13 +103,18 @@ public class RegistroUsuario {
         );
     }
 
-    @Given("Cierra sesión y vuelve a la página de registro")
+    @Then("Cierra sesión")
     public void CierraSesion() {
         testActor.attemptsTo(
                 Click.on(PerfilUI.BTN_MENU),
-                Click.on(PerfilUI.BTN_CERRAR_SESION),
-                Click.on(RegistroUI.BTN_REGISTRARSE)
+                Click.on(PerfilUI.BTN_CERRAR_SESION)
         );
+    }
+
+    @Given("Cierra sesión y vuelve a la página de registro")
+    public void CierraSesionYVuelveARegistro() {
+        CierraSesion();
+        testActor.attemptsTo(Click.on(RegistroUI.BTN_REGISTRARSE));
     }
 
     @When("Intenta registrarse con el correo del {string} recién registrado")
