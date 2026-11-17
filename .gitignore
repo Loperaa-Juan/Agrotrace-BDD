@@ -1,0 +1,61 @@
+### Gradle ###
+# Caché y resultados de compilación. El wrapper sí se sube para que cualquiera pueda compilar.
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### Kotlin ###
+.kotlin
+
+### Serenity BDD ###
+# Reportes, capturas de pantalla e historial que se generan en cada ejecución
+target/
+history/
+
+### IntelliJ IDEA ###
+# Configuración local del IDE (rutas del JDK y de Gradle de cada equipo).
+# IntelliJ la regenera al abrir el proyecto desde build.gradle.kts.
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Sistema operativo ###
+.DS_Store
+Thumbs.db
+desktop.ini
+
+### Logs ###
+*.log
+
+### Variables de entorno y secretos ###
+# Si algún día usas credenciales reales, van aquí y nunca en el código
+.env
+.env.*
