@@ -5,7 +5,7 @@ package models;
 public class DatosUsuarios {
 
     private static final String TIPO_DOCUMENTO_PERSONA = "CC";
-    // PENDIENTE: reemplazar por el texto exacto de la opción NIT en la lista "Tipo de documento"
+
     private static final String TIPO_DOCUMENTO_NEGOCIO = "NIT";
 
     // Parte de la hora actual y suma 1 por cada usuario creado:
