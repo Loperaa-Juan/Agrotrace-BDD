@@ -5,6 +5,8 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import models.CredencialesLogin;
+import models.DatosCosecha;
+import models.DatosCosechas;
 import models.UsuariosRegistrados;
 import net.serenitybdd.annotations.Managed;
 import net.serenitybdd.screenplay.Actor;
@@ -62,4 +64,11 @@ public class PublicarCosecha {
                 seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_FOTO))
         );
     }
+
+    @When("Publica una cosecha de {string} con datos validos y la imagen {string}")
+    public void PublicaCosechaConCamposValidos(String producto, String imagen) {
+        DatosCosecha cosecha = DatosCosechas.nueva(producto, imagen);
+        // PENDIENTE: llenar el formulario con LlenarDatosCosechaTask y publicar la cosecha
+    }
+
 }

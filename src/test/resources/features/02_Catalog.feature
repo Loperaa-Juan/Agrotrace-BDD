@@ -5,12 +5,11 @@ Feature: Publicación de cosechas en Agrotrace
     When Intenta publicar una cosecha sin los campos obligatorios
     Then Ve mensajes de error por los campos obligatorios faltantes
 
-  #Scenario: Publicación Exitosa de una cosecha de calidad A
-  #  Given El agricultor se encuentra en el formulario de publicación
-  #  When Publica una cosecha con datos validos y la imagen "imagen A"
-  #  Then La cosecha debería ser clasificada con "Calidad Buena"
-  #  And debería ver el mensaje de "¡Su cosecha quedó publicada!"
-#
+  Scenario: Publicación Exitosa de una cosecha de calidad A
+    When Publica una cosecha de "aguacate" con datos validos y la imagen "fresh_avocado.jpeg"
+    Then La cosecha debería ser clasificada con "Calidad Buena"
+    And debería ver el mensaje de "¡Su cosecha quedó publicada!"
+
   #Scenario: Publicación Exitosa de una cosecha de calidad B
   #  Given El agricultor se encuentra en el formulario de publicación
   #  When Publica una cosecha con datos validos y la imagen "imagen B"
