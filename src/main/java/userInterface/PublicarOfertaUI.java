@@ -35,4 +35,13 @@ public class PublicarOfertaUI {
 
     // Input donde se escribe la descripción de la cosecha
     public static final Target INPUT_DESCRIPCION = Target.the("Input para la descripción de la cosecha").located(By.id("descripcion"));
+
+    // Input donde se escribe la fecha de la cosecha
+    public static final Target INPUT_FECHA = Target.the("Input para ingresar la fecha de la cosecha").located(By.id("fecha"));
+
+    // Botón para revisar la información de la cosecha antes de publicar
+    public static final Target BTN_REVISAR_INFO = Target.the("Botón para revisar la información de la cosecha").located(By.id("btn-revisar-info"));
+
+    // Botón para publicar la cosecha
+    public static final Target BTN_PUBLICAR_COSECHA = Target.the("Botón para publicar la cosecha").located(By.id("btn-publicar-cosecha"));
 }
