@@ -14,6 +14,7 @@ import net.serenitybdd.screenplay.abilities.BrowseTheWeb;
 import net.serenitybdd.screenplay.actions.Click;
 import org.openqa.selenium.WebDriver;
 import question.ElementoPresente;
+import task.LlenarDatosCosechaTask;
 import task.LlenarDatosLoginTask;
 import userInterface.LoginUI;
 import userInterface.PerfilUI;
@@ -68,7 +69,11 @@ public class PublicarCosecha {
     @When("Publica una cosecha de {string} con datos validos y la imagen {string}")
     public void PublicaCosechaConCamposValidos(String producto, String imagen) {
         DatosCosecha cosecha = DatosCosechas.nueva(producto, imagen);
-        // PENDIENTE: llenar el formulario con LlenarDatosCosechaTask y publicar la cosecha
+
+        testActor.attemptsTo(
+                LlenarDatosCosechaTask.con(cosecha),
+                Click.on(PublicarOfertaUI.BTN_PUBLICAR_COSECHA)
+        );
     }
 
 }
