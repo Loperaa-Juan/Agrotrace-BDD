@@ -41,6 +41,10 @@ Feature: Publicación de cosechas en Agrotrace
     When El "negocio" registrado anteriormente inicia sesión
     Then debería ver las cosechas publicadas por el agricultor
 
+  Scenario: Un negocio no puede abrir el formulario de publicación
+    When Intenta abrir el formulario de publicación
+    Then Ve la lista de cosechas disponibles en la plataforma
+
   Scenario: Un usuario que no es agricultor no puede publicar cosechas
     When Despliega el menú de opciones del usuario
     Then No debe ver la opción de publicar cosecha
