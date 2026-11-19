@@ -13,9 +13,6 @@ public class PerfilUI {
     // Menú usuario
     public static final Target BTN_MENU = Target.the("Menú desplegable").located(By.id("menu-usuario"));
 
-    // Botón publicar cosecha
-
-
     // Botón de cerrar sesión
     public static final Target BTN_CERRAR_SESION = Target.the("Botón de cerrar sesión").located(By.id("btn-cerrar-sesion"));
 
