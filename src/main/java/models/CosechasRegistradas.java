@@ -9,6 +9,10 @@ public class CosechasRegistradas {
 
     private static final Map<String, DatosCosecha> cosechas = new HashMap<>();
 
+    // Cosecha que la IA rechazó (calidad C). Va aparte para que no entre en obtenerTodas(),
+    // que son las cosechas que sí deben aparecer en el catálogo.
+    private static DatosCosecha rechazada;
+
     // Guarda la cosecha con la calidad que le asignó la IA ("Calidad Buena", "Calidad Regular").
     // Si ya había una cosecha con esa calidad, la reemplaza.
     public static void guardar(String calidad, DatosCosecha cosecha) {
@@ -33,5 +37,19 @@ public class CosechasRegistradas {
                     + "Ejecuta el feature completo.");
         }
         return List.copyOf(cosechas.values());
+    }
+
+    // Guarda la cosecha que la IA rechazó para validar después que no aparece en el catálogo.
+    public static void guardarRechazada(DatosCosecha cosecha) {
+        rechazada = cosecha;
+    }
+
+    // Devuelve la cosecha rechazada en esta ejecución.
+    public static DatosCosecha obtenerRechazada() {
+        if (rechazada == null) {
+            throw new IllegalStateException("No hay una cosecha rechazada en esta ejecución. "
+                    + "Ejecuta el feature completo.");
+        }
+        return rechazada;
     }
 }

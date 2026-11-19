@@ -157,6 +157,8 @@ public class PublicarCosecha {
         testActor.should(
                 seeThat(the(PublicarOfertaUI.BTN_PUBLICAR_COSECHA), isNotEnabled())
         );
+        // La IA la rechazó: se guarda para validar después que no aparece en el catálogo
+        CosechasRegistradas.guardarRechazada(cosechaEnPublicacion);
     }
 
     @Given("El agricultor vuelve a la primera vista del formulario de publicación")
@@ -208,6 +210,14 @@ public class PublicarCosecha {
                     seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosecha)))
             );
         }
+    }
+
+    @And("no debería ver la cosecha rechazada por la IA")
+    public void ValidaQueNoApareceLaCosechaRechazada() {
+        // Se usa después de "debería ver las cosechas publicadas por el agricultor", que ya esperó a que cargara el catálogo
+        testActor.should(
+                seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(CosechasRegistradas.obtenerRechazada())), equalTo(false))
+        );
     }
 
     @When("Despliega el menú de opciones del usuario")

@@ -40,6 +40,7 @@ Feature: Publicación de cosechas en Agrotrace
   Scenario: Las cosechas publicadas son visibles en el catálogo
     When El "negocio" registrado anteriormente inicia sesión
     Then debería ver las cosechas publicadas por el agricultor
+    And no debería ver la cosecha rechazada por la IA
 
   Scenario: Un negocio no puede abrir el formulario de publicación
     When Intenta abrir el formulario de publicación
