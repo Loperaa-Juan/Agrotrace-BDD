@@ -18,4 +18,9 @@ public class PerfilUI {
 
     // Botón para publicar cosechas
     public static final Target BTN_PUBLICAR_COSECHA = Target.the("Botón para publicar cosecha").located(By.id("btn-publicar-cosecha"));
-    }
+
+    // Opción del menú de usuario que lleva a la página de filtros y búsqueda
+    public static final Target BTN_FILTROS_BUSQUEDA = Target.the("Opción para ir a la página de filtros").located(By.id("btn-filtros-busqueda"));
+
+
+}
