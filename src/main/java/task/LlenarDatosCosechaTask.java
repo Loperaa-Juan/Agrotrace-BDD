@@ -8,6 +8,8 @@ import net.serenitybdd.screenplay.Tasks;
 import net.serenitybdd.screenplay.actions.*;
 import net.serenitybdd.screenplay.targets.Target;
 import net.serenitybdd.screenplay.waits.WaitUntil;
+import userInterface.PublicarOfertaUI;
+
 import static net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible;
 
 import java.nio.file.Path;
@@ -36,10 +38,13 @@ public class LlenarDatosCosechaTask implements Task {
         cargarFoto(actor, cosecha.getFoto(), INPUT_FOTO);
         escribir(actor, cosecha.getDescripcion(), INPUT_DESCRIPCION);
         actor.attemptsTo(
-                Click.on(BTN_REVISAR_INFO),
-                WaitUntil.the(INPUT_FECHA,isVisible()).forNoMoreThan(8).seconds()
+            Click.on(PublicarOfertaUI.BTN_SIGUIENTE)
         );
         llenarFecha(actor, cosecha.getFechaCosecha(), INPUT_FECHA);
+        actor.attemptsTo(
+                Click.on(BTN_REVISAR_INFO),
+                WaitUntil.the(INPUT_FECHA,isVisible()).forNoMoreThan(10).seconds()
+        );
 
     }
 
@@ -49,7 +54,7 @@ public class LlenarDatosCosechaTask implements Task {
 
     private void seleccionarProducto(Actor actor, String tipo) {
         if(tieneValor(tipo)) {
-            actor.attemptsTo(SelectFromOptions.byValue(tipo).from(SELECT_PRODUCTO));
+            actor.attemptsTo(SelectFromOptions.byVisibleText(tipo).from(SELECT_PRODUCTO));
         }
     }
 
