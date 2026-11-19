@@ -30,3 +30,9 @@ Feature: Filtros del catálogo de cosechas en AgroTrace
     When filtra las cosechas con precio hasta "5000" pesos
     Then debería ver las cosechas publicadas en los resultados
     And debería ver solo cosechas con precio hasta "5000" pesos
+
+  Scenario: Combinar los filtros de calidad y precio
+    When filtra las cosechas por "calidad B"
+    Then debería ver solo cosechas de calidad "B"
+    And no debería ver la cosecha de calidad "A"
+    And debería ver solo cosechas con precio hasta "5000" pesos
