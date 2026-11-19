@@ -44,4 +44,22 @@ public class PublicarOfertaUI {
 
     // Botón para publicar la cosecha
     public static final Target BTN_PUBLICAR_COSECHA = Target.the("Botón para publicar la cosecha").located(By.id("btn-publicar-cosecha"));
+
+    // Letrero que muestra la calidad asignada por la IA a la cosecha
+    public static final Target TXT_CALIDAD_IA = Target.the("Letrero de la calidad asignada por IA").located(By.id("calidad-ia"));
+
+    // Mensaje que aparece cuando la cosecha quedó publicada
+    public static final Target MSG_COSECHA_PUBLICADA = Target.the("Mensaje de cosecha publicada").located(By.id("mensaje-publicada"));
+
+    // Botón para volver al perfil después de publicar la cosecha
+    public static final Target BTN_VOLVER_PERFIL = Target.the("Botón para volver al perfil").located(By.id("btn-volver-perfil"));
+
+    // Letrero de alerta que aparece cuando la cosecha no es aceptada por ser clasificada como calidad C
+    public static final Target MSG_ALERTA_ERROR = Target.the("Alerta de cosecha rechazada por calidad C").located(By.id("alerta-error"));
+
+    // Botón para volver atrás a los datos de la cosecha
+    public static final Target BTN_VOLVER_DATOS = Target.the("Botón para volver a los datos de la cosecha").located(By.id("btn-volver-datos"));
+
+    // Botón para volver de la revisión al paso de la fecha. No tiene id: es el botón que está antes del de publicar
+    public static final Target BTN_VOLVER_REVISION = Target.the("Botón para volver de la revisión a la fecha de la cosecha").located(By.xpath("//button[@id='btn-publicar-cosecha']/preceding-sibling::button"));
 }
