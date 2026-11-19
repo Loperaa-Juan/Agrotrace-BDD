@@ -24,7 +24,6 @@ import userInterface.CatalogoUI;
 import userInterface.LoginUI;
 import userInterface.PerfilUI;
 import userInterface.PublicarOfertaUI;
-import userInterface.RegistroUI;
 
 import java.text.NumberFormat;
 import java.util.Locale;
