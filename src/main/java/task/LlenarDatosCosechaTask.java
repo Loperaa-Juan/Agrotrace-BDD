@@ -41,9 +41,11 @@ public class LlenarDatosCosechaTask implements Task {
             Click.on(PublicarOfertaUI.BTN_SIGUIENTE)
         );
         llenarFecha(actor, cosecha.getFechaCosecha(), INPUT_FECHA);
+        // La IA tarda en clasificar la foto (el botón muestra "Revisando…").
+        // Espera hasta 60 s a que termine; sigue apenas aparece la calidad o la alerta de error.
         actor.attemptsTo(
                 Click.on(BTN_REVISAR_INFO),
-                WaitUntil.the(INPUT_FECHA,isVisible()).forNoMoreThan(10).seconds()
+                WaitUntil.the(RESULTADO_REVISION_IA, isVisible()).forNoMoreThan(60).seconds()
         );
 
     }

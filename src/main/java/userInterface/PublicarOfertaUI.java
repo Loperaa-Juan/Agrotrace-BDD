@@ -62,4 +62,7 @@ public class PublicarOfertaUI {
 
     // Botón para volver de la revisión al paso de la fecha. No tiene id: es el botón que está antes del de publicar
     public static final Target BTN_VOLVER_REVISION = Target.the("Botón para volver de la revisión a la fecha de la cosecha").located(By.xpath("//button[@id='btn-publicar-cosecha']/preceding-sibling::button"));
+
+    // Resultado de la revisión de la IA: la calidad (paso 3) o la alerta de error (paso 2, por ejemplo sin fruta)
+    public static final Target RESULTADO_REVISION_IA = Target.the("Resultado de la revisión de la IA").located(By.xpath("//*[@id='calidad-ia'] | //*[@id='alerta-error']"));
 }
