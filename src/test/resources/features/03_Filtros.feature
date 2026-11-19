@@ -36,3 +36,8 @@ Feature: Filtros del catálogo de cosechas en AgroTrace
     Then debería ver solo cosechas de calidad "B"
     And no debería ver la cosecha de calidad "A"
     And debería ver solo cosechas con precio hasta "5000" pesos
+
+  Scenario: Buscar con parte del nombre y en minúsculas
+    Given el negocio limpia la búsqueda anterior
+    When busca el producto "aguacate"
+    Then debería ver las cosechas publicadas en los resultados
