@@ -9,17 +9,17 @@ public class CosechasRegistradas {
 
     private static final Map<String, DatosCosecha> cosechas = new HashMap<>();
 
-    // Guarda la cosecha usando el nombre de su foto como clave, porque cada escenario usa una foto distinta.
-    // Si ya había una cosecha con esa foto, la reemplaza.
-    public static void guardar(DatosCosecha cosecha) {
-        cosechas.put(cosecha.getFoto(), cosecha);
+    // Guarda la cosecha con la calidad que le asignó la IA ("Calidad Buena", "Calidad Regular").
+    // Si ya había una cosecha con esa calidad, la reemplaza.
+    public static void guardar(String calidad, DatosCosecha cosecha) {
+        cosechas.put(calidad, cosecha);
     }
 
-    // Devuelve la cosecha guardada con esa foto.
-    public static DatosCosecha obtener(String foto) {
-        DatosCosecha cosecha = cosechas.get(foto);
+    // Devuelve la última cosecha guardada con esa calidad.
+    public static DatosCosecha obtener(String calidad) {
+        DatosCosecha cosecha = cosechas.get(calidad);
         if (cosecha == null) {
-            throw new IllegalStateException("No hay una cosecha con la foto '" + foto
+            throw new IllegalStateException("No hay una cosecha con '" + calidad
                     + "' publicada en esta ejecución. Ejecuta el feature completo.");
         }
         return cosecha;

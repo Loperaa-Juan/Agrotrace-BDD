@@ -25,9 +25,6 @@ import userInterface.LoginUI;
 import userInterface.PerfilUI;
 import userInterface.PublicarOfertaUI;
 
-import java.text.NumberFormat;
-import java.util.Locale;
-
 import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static net.serenitybdd.screenplay.matchers.WebElementStateMatchers.*;
 import static net.serenitybdd.screenplay.questions.WebElementQuestion.the;
@@ -39,6 +36,9 @@ public class PublicarCosecha {
     // Cosecha que se está publicando en el escenario actual.
     // Se guarda en CosechasRegistradas solo cuando la app confirma que quedó publicada.
     private DatosCosecha cosechaEnPublicacion;
+
+    // Calidad que la IA le asignó a esa cosecha; con ella se guarda en CosechasRegistradas
+    private String calidadEnPublicacion;
 
     @Managed
     WebDriver driver;
@@ -96,6 +96,7 @@ public class PublicarCosecha {
         testActor.should(
                 seeThat(TextoElemento.de(PublicarOfertaUI.TXT_CALIDAD_IA), equalTo(calidad))
         );
+        calidadEnPublicacion = calidad;
     }
 
     @And("debería ver el mensaje de {string}")
@@ -104,7 +105,7 @@ public class PublicarCosecha {
                 seeThat(TextoElemento.de(PublicarOfertaUI.MSG_COSECHA_PUBLICADA), equalTo(mensaje))
         );
         // La app confirmó la publicación: se guarda para validarla después en el catálogo
-        CosechasRegistradas.guardar(cosechaEnPublicacion);
+        CosechasRegistradas.guardar(calidadEnPublicacion, cosechaEnPublicacion);
 
         testActor.attemptsTo(
                 Click.on(PublicarOfertaUI.BTN_VOLVER_PERFIL)
@@ -159,12 +160,7 @@ public class PublicarCosecha {
 
         for (DatosCosecha cosecha : CosechasRegistradas.obtenerTodas()) {
             testActor.should(
-                    seeThat(ElementoPresente.en(CatalogoUI.TARJETA_COSECHA.of(
-                            cosecha.getProducto(),
-                            cosecha.getDescripcion(),
-                            formatoColombiano(cosecha.getPrecio()),
-                            formatoColombiano(cosecha.getCantidad())
-                    )))
+                    seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosecha)))
             );
         }
     }
@@ -174,11 +170,6 @@ public class PublicarCosecha {
         testActor.attemptsTo(
                 Click.on(PerfilUI.BTN_MENU)
         );
-    }
-
-    // Formatea el número como lo muestra la app (toLocaleString("es-CO")): 5000 -> "5.000"
-    private String formatoColombiano(int numero) {
-        return NumberFormat.getIntegerInstance(Locale.forLanguageTag("es-CO")).format(numero);
     }
 
     @Then("No debe ver la opción de publicar cosecha")
