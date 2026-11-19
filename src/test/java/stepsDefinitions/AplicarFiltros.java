@@ -189,6 +189,19 @@ public class AplicarFiltros {
         );
     }
 
+    @Then("debería ver las cosechas publicadas en los resultados")
+    public void ValidaQueAparecenLasCosechasPublicadas() {
+        // Espera la tarjeta de cada cosecha publicada en esta ejecución (máximo 10 s, sigue apenas aparezca)
+        for (DatosCosecha cosecha : CosechasRegistradas.obtenerTodas()) {
+            testActor.attemptsTo(
+                    WaitUntil.the(CatalogoUI.tarjetaDe(cosecha), isVisible()).forNoMoreThan(10).seconds()
+            );
+            testActor.should(
+                    seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosecha)))
+            );
+        }
+    }
+
     @And("no debería ver las cosechas publicadas en los resultados")
     public void ValidaQueNoAparecenLasCosechasPublicadas() {
         // Las cosechas publicadas en esta ejecución cuestan 5000: con un límite menor el filtro las debe ocultar.
