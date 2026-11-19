@@ -1,9 +1,11 @@
 package stepsDefinitions;
 
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import models.CosechasRegistradas;
 import models.CredencialesLogin;
 import models.DatosCosecha;
 import models.DatosCosechas;
@@ -12,19 +14,32 @@ import net.serenitybdd.annotations.Managed;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.abilities.BrowseTheWeb;
 import net.serenitybdd.screenplay.actions.Click;
+import net.serenitybdd.screenplay.waits.WaitUntil;
 import org.openqa.selenium.WebDriver;
 import question.ElementoPresente;
+import question.TextoElemento;
 import task.LlenarDatosCosechaTask;
 import task.LlenarDatosLoginTask;
+import userInterface.CatalogoUI;
 import userInterface.LoginUI;
 import userInterface.PerfilUI;
 import userInterface.PublicarOfertaUI;
 import userInterface.RegistroUI;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
+import static net.serenitybdd.screenplay.matchers.WebElementStateMatchers.*;
+import static net.serenitybdd.screenplay.questions.WebElementQuestion.the;
+import static org.hamcrest.Matchers.equalTo;
 
 public class PublicarCosecha {
     private Actor testActor;
+
+    // Cosecha que se está publicando en el escenario actual.
+    // Se guarda en CosechasRegistradas solo cuando la app confirma que quedó publicada.
+    private DatosCosecha cosechaEnPublicacion;
 
     @Managed
     WebDriver driver;
@@ -69,6 +84,7 @@ public class PublicarCosecha {
     @When("Publica una cosecha de {string} con datos validos y la imagen {string}")
     public void PublicaCosechaConCamposValidos(String producto, String imagen) {
         DatosCosecha cosecha = DatosCosechas.nueva(producto, imagen);
+        cosechaEnPublicacion = cosecha;
 
         testActor.attemptsTo(
                 LlenarDatosCosechaTask.con(cosecha),
@@ -76,4 +92,100 @@ public class PublicarCosecha {
         );
     }
 
+    @Then("La cosecha debería ser clasificada con {string}")
+    public void ValidaCalidadAsignadaDeCosecha(String calidad) {
+        testActor.should(
+                seeThat(TextoElemento.de(PublicarOfertaUI.TXT_CALIDAD_IA), equalTo(calidad))
+        );
+    }
+
+    @And("debería ver el mensaje de {string}")
+    public void ValidaCosechaPublicada(String mensaje) {
+        testActor.should(
+                seeThat(TextoElemento.de(PublicarOfertaUI.MSG_COSECHA_PUBLICADA), equalTo(mensaje))
+        );
+        // La app confirmó la publicación: se guarda para validarla después en el catálogo
+        CosechasRegistradas.guardar(cosechaEnPublicacion);
+
+        testActor.attemptsTo(
+                Click.on(PublicarOfertaUI.BTN_VOLVER_PERFIL)
+        );
+    }
+
+    @Given("El agricultor se encuentra en el formulario de publicación")
+    public void IngresaAlFormularioDePublicacion() {
+        testActor.attemptsTo(
+                Click.on(PerfilUI.BTN_PUBLICAR_COSECHA)
+        );
+    }
+
+    @Then("Se debe mostar el mensaje de {string}")
+    public void ValidaAlertaDeCosechaRechazada(String mensaje) {
+        testActor.should(
+                seeThat(TextoElemento.de(PublicarOfertaUI.MSG_ALERTA_ERROR), equalTo(mensaje))
+        );
+    }
+
+    @And("El botón para publicar la cosecha debe estar desactivado")
+    public void ValidaBotonPublicarDesactivado() {
+        testActor.should(
+                seeThat(the(PublicarOfertaUI.BTN_PUBLICAR_COSECHA), isNotEnabled())
+        );
+    }
+
+    @Given("El agricultor vuelve a la primera vista del formulario de publicación")
+    public void VuelveALaPrimeraVistaDelFormulario() {
+        testActor.attemptsTo(
+                Click.on(PublicarOfertaUI.BTN_VOLVER_REVISION),
+                Click.on(PublicarOfertaUI.BTN_VOLVER_DATOS)
+        );
+    }
+
+    @When("Intenta publicar una cosecha de {string} con datos validos y la imagen {string}")
+    public void IntentaPublicarCosechaConCamposValidos(String producto, String imagen) {
+        // Llena el formulario sin publicar: si la imagen no tiene fruta, la app se queda en el paso 2
+        DatosCosecha cosecha = DatosCosechas.nueva(producto, imagen);
+
+        testActor.attemptsTo(
+                LlenarDatosCosechaTask.con(cosecha)
+        );
+    }
+
+    @Then("debería ver las cosechas publicadas por el agricultor")
+    public void ValidaCosechasPublicadasEnCatalogo() {
+        // El catálogo carga las cosechas después de abrir la página (máximo 10 s, sigue apenas aparezcan)
+        testActor.attemptsTo(
+                WaitUntil.the(CatalogoUI.LISTA_PRODUCTOS, isVisible()).forNoMoreThan(10).seconds()
+        );
+
+        for (DatosCosecha cosecha : CosechasRegistradas.obtenerTodas()) {
+            testActor.should(
+                    seeThat(ElementoPresente.en(CatalogoUI.TARJETA_COSECHA.of(
+                            cosecha.getProducto(),
+                            cosecha.getDescripcion(),
+                            formatoColombiano(cosecha.getPrecio()),
+                            formatoColombiano(cosecha.getCantidad())
+                    )))
+            );
+        }
+    }
+
+    @When("Despliega el menú de opciones del usuario")
+    public void DespliegaMenuDeUsuario() {
+        testActor.attemptsTo(
+                Click.on(PerfilUI.BTN_MENU)
+        );
+    }
+
+    // Formatea el número como lo muestra la app (toLocaleString("es-CO")): 5000 -> "5.000"
+    private String formatoColombiano(int numero) {
+        return NumberFormat.getIntegerInstance(Locale.forLanguageTag("es-CO")).format(numero);
+    }
+
+    @Then("No debe ver la opción de publicar cosecha")
+    public void noSeDebeRenderizar() {
+        testActor.should(
+                seeThat(the(PerfilUI.BTN_PUBLICAR_COSECHA), isNotPresent())
+        );
+    }
 }
