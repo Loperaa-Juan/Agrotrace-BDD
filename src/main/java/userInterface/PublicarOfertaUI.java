@@ -1,11 +1,12 @@
 package userInterface;
 
 import net.serenitybdd.annotations.DefaultUrl;
+import net.serenitybdd.core.pages.PageObject;
 import net.serenitybdd.screenplay.targets.Target;
 import org.openqa.selenium.By;
 
 @DefaultUrl("http://localhost:5173/publicar")
-public class PublicarOfertaUI {
+public class PublicarOfertaUI extends PageObject {
     // Botón que lleva al siguiente paso del formulario
     public static final Target BTN_SIGUIENTE = Target.the("Botón para continuar con el resto de datos").located(By.id("btn-siguiente"));
 

@@ -15,6 +15,7 @@ import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.abilities.BrowseTheWeb;
 import net.serenitybdd.screenplay.actions.Click;
 import net.serenitybdd.screenplay.actions.Enter;
+import net.serenitybdd.screenplay.actions.Open;
 import net.serenitybdd.screenplay.waits.WaitUntil;
 import org.openqa.selenium.WebDriver;
 import question.ElementoPresente;
@@ -173,6 +174,25 @@ public class PublicarCosecha {
 
         testActor.attemptsTo(
                 LlenarDatosCosechaTask.con(cosecha)
+        );
+    }
+
+    @When("Intenta abrir el formulario de publicación")
+    public void IntentaAbrirFormularioDePublicacion() {
+        // Abre /publicar directamente por URL, sin pasar por el menú
+        testActor.attemptsTo(
+                Open.browserOn().the(PublicarOfertaUI.class)
+        );
+    }
+
+    @Then("Es redirigido al inicio de sesión")
+    public void ValidaRedireccionAlInicioDeSesion() {
+        // La app redirige /publicar al login cuando no hay sesión (máximo 10 s, sigue apenas aparezca)
+        testActor.attemptsTo(
+                WaitUntil.the(LoginUI.INPUT_EMAIL, isVisible()).forNoMoreThan(10).seconds()
+        );
+        testActor.should(
+                seeThat(ElementoPresente.en(LoginUI.INPUT_EMAIL))
         );
     }
 
