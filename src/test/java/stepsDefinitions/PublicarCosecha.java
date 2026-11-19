@@ -14,6 +14,7 @@ import net.serenitybdd.annotations.Managed;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.abilities.BrowseTheWeb;
 import net.serenitybdd.screenplay.actions.Click;
+import net.serenitybdd.screenplay.actions.Enter;
 import net.serenitybdd.screenplay.waits.WaitUntil;
 import org.openqa.selenium.WebDriver;
 import question.ElementoPresente;
@@ -77,6 +78,30 @@ public class PublicarCosecha {
                 seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_CANTIDAD)),
                 seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_PRECIO)),
                 seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_FOTO))
+        );
+    }
+
+    @When("Intenta continuar con cantidad {string} y precio {string}")
+    public void IntentaContinuarConCantidadYPrecio(String cantidad, String precio) {
+        testActor.attemptsTo(
+                Enter.theValue(cantidad).into(PublicarOfertaUI.INPUT_CANTIDAD),
+                Enter.theValue(precio).into(PublicarOfertaUI.INPUT_PRECIO),
+                Click.on(PublicarOfertaUI.BTN_SIGUIENTE)
+        );
+    }
+
+    // El mensaje de error trae un ícono que se lee como texto ("error"), por eso se valida con containsText
+    @Then("Debería ver el error de cantidad {string}")
+    public void ValidaErrorDeCantidad(String mensaje) {
+        testActor.should(
+                seeThat(the(PublicarOfertaUI.MSG_ERROR_CANTIDAD), containsText(mensaje))
+        );
+    }
+
+    @And("Debería ver el error de precio {string}")
+    public void ValidaErrorDePrecio(String mensaje) {
+        testActor.should(
+                seeThat(the(PublicarOfertaUI.MSG_ERROR_PRECIO), containsText(mensaje))
         );
     }
 
