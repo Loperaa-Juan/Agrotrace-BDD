@@ -24,3 +24,4 @@ Feature: Filtros del catálogo de cosechas en AgroTrace
     Given el negocio limpia la búsqueda anterior
     When filtra las cosechas con precio hasta "4000" pesos
     Then debería ver solo cosechas con precio hasta "4000" pesos
+    And no debería ver las cosechas publicadas en los resultados

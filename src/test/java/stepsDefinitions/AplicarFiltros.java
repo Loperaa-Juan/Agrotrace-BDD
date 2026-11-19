@@ -189,6 +189,17 @@ public class AplicarFiltros {
         );
     }
 
+    @And("no debería ver las cosechas publicadas en los resultados")
+    public void ValidaQueNoAparecenLasCosechasPublicadas() {
+        // Las cosechas publicadas en esta ejecución cuestan 5000: con un límite menor el filtro las debe ocultar.
+        // Se usa después de "debería ver solo cosechas con precio hasta…", que ya esperó a que cargaran las cosechas.
+        for (DatosCosecha cosecha : CosechasRegistradas.obtenerTodas()) {
+            testActor.should(
+                    seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosecha)), equalTo(false))
+            );
+        }
+    }
+
     // "$ 5.000 COP / unidad" -> 5000.0 (formato es-CO: punto de miles, coma decimal)
     private double precioDe(String textoPrecio) {
         String numero = textoPrecio.substring(textoPrecio.indexOf('$') + 1, textoPrecio.indexOf("COP")).trim();
