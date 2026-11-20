@@ -1,5 +1,7 @@
 package models;
 
+import exceptions.RecorridoIncompletoException;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +25,8 @@ public class CosechasRegistradas {
     public static DatosCosecha obtener(String calidad) {
         DatosCosecha cosecha = cosechas.get(calidad);
         if (cosecha == null) {
-            throw new IllegalStateException("No hay una cosecha con '" + calidad
-                    + "' publicada en esta ejecución. Ejecuta el feature completo.");
+            throw new RecorridoIncompletoException("No hay una cosecha con '" + calidad
+                    + "' publicada en esta ejecución.");
         }
         return cosecha;
     }
@@ -33,8 +35,7 @@ public class CosechasRegistradas {
     // Si no hay ninguna, falla: así la validación del catálogo no pasa sin haber revisado nada.
     public static List<DatosCosecha> obtenerTodas() {
         if (cosechas.isEmpty()) {
-            throw new IllegalStateException("No hay cosechas publicadas en esta ejecución. "
-                    + "Ejecuta el feature completo.");
+            throw new RecorridoIncompletoException("No hay cosechas publicadas en esta ejecución.");
         }
         return List.copyOf(cosechas.values());
     }
@@ -47,8 +48,7 @@ public class CosechasRegistradas {
     // Devuelve la cosecha rechazada en esta ejecución.
     public static DatosCosecha obtenerRechazada() {
         if (rechazada == null) {
-            throw new IllegalStateException("No hay una cosecha rechazada en esta ejecución. "
-                    + "Ejecuta el feature completo.");
+            throw new RecorridoIncompletoException("No hay una cosecha rechazada en esta ejecución.");
         }
         return rechazada;
     }

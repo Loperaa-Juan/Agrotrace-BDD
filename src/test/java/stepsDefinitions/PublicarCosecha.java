@@ -1,5 +1,10 @@
 package stepsDefinitions;
 
+import exceptions.AccesoNoRestringidoException;
+import exceptions.CosechaNoVisibleException;
+import exceptions.MensajeDeErrorNoMostradoException;
+import exceptions.PublicacionFallidaException;
+import exceptions.RechazoNoAplicadoException;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -16,7 +21,6 @@ import net.serenitybdd.screenplay.abilities.BrowseTheWeb;
 import net.serenitybdd.screenplay.actions.Click;
 import net.serenitybdd.screenplay.actions.Enter;
 import net.serenitybdd.screenplay.actions.Open;
-import net.serenitybdd.screenplay.waits.WaitUntil;
 import org.openqa.selenium.WebDriver;
 import question.ElementoPresente;
 import question.TextoElemento;
@@ -27,6 +31,7 @@ import userInterface.LoginUI;
 import userInterface.PerfilUI;
 import userInterface.PublicarOfertaUI;
 
+import static net.serenitybdd.screenplay.EventualConsequence.eventually;
 import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static net.serenitybdd.screenplay.matchers.WebElementStateMatchers.*;
 import static net.serenitybdd.screenplay.questions.WebElementQuestion.the;
@@ -75,10 +80,14 @@ public class PublicarCosecha {
     @Then("Ve mensajes de error por los campos obligatorios faltantes")
     public void validaMensajesDeCamposFaltantes() {
         testActor.should(
-                seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_PRODUCTO)),
-                seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_CANTIDAD)),
-                seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_PRECIO)),
-                seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_FOTO))
+                seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_PRODUCTO), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE),
+                seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_CANTIDAD), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE),
+                seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_PRECIO), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE),
+                seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_FOTO), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE)
         );
     }
 
@@ -96,6 +105,7 @@ public class PublicarCosecha {
     public void validaErrorDeCantidad(String mensaje) {
         testActor.should(
                 seeThat(the(PublicarOfertaUI.MSG_ERROR_CANTIDAD), containsText(mensaje))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE)
         );
     }
 
@@ -103,6 +113,7 @@ public class PublicarCosecha {
     public void validaErrorDePrecio(String mensaje) {
         testActor.should(
                 seeThat(the(PublicarOfertaUI.MSG_ERROR_PRECIO), containsText(mensaje))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE)
         );
     }
 
@@ -121,6 +132,7 @@ public class PublicarCosecha {
     public void validaCalidadAsignadaDeCosecha(String calidad) {
         testActor.should(
                 seeThat(TextoElemento.de(PublicarOfertaUI.TXT_CALIDAD_IA), equalTo(calidad))
+                        .orComplainWith(PublicacionFallidaException.class, PublicacionFallidaException.MENSAJE)
         );
         calidadEnPublicacion = calidad;
     }
@@ -129,6 +141,7 @@ public class PublicarCosecha {
     public void validaCosechaPublicada(String mensaje) {
         testActor.should(
                 seeThat(TextoElemento.de(PublicarOfertaUI.MSG_COSECHA_PUBLICADA), equalTo(mensaje))
+                        .orComplainWith(PublicacionFallidaException.class, PublicacionFallidaException.MENSAJE)
         );
         // La app confirmó la publicación: se guarda para validarla después en el catálogo
         CosechasRegistradas.guardar(calidadEnPublicacion, cosechaEnPublicacion);
@@ -149,6 +162,7 @@ public class PublicarCosecha {
     public void validaAlertaDeCosechaRechazada(String mensaje) {
         testActor.should(
                 seeThat(TextoElemento.de(PublicarOfertaUI.MSG_ALERTA_ERROR), equalTo(mensaje))
+                        .orComplainWith(RechazoNoAplicadoException.class, RechazoNoAplicadoException.MENSAJE)
         );
     }
 
@@ -156,6 +170,7 @@ public class PublicarCosecha {
     public void validaBotonPublicarDesactivado() {
         testActor.should(
                 seeThat(the(PublicarOfertaUI.BTN_PUBLICAR_COSECHA), isNotEnabled())
+                        .orComplainWith(RechazoNoAplicadoException.class, RechazoNoAplicadoException.MENSAJE)
         );
         // La IA la rechazó: se guarda para validar después que no aparece en el catálogo
         CosechasRegistradas.guardarRechazada(cosechaEnPublicacion);
@@ -190,24 +205,22 @@ public class PublicarCosecha {
     @Then("Es redirigido al inicio de sesión")
     public void validaRedireccionAlInicioDeSesion() {
         // La app redirige /publicar al login cuando no hay sesión (máximo 10 s, sigue apenas aparezca)
-        testActor.attemptsTo(
-                WaitUntil.the(LoginUI.INPUT_EMAIL, isVisible()).forNoMoreThan(10).seconds()
-        );
         testActor.should(
-                seeThat(ElementoPresente.en(LoginUI.INPUT_EMAIL))
+                eventually(seeThat(ElementoPresente.en(LoginUI.INPUT_EMAIL), equalTo(true))
+                        .orComplainWith(AccesoNoRestringidoException.class, AccesoNoRestringidoException.MENSAJE))
+                        .waitingForNoLongerThan(10).seconds()
         );
     }
 
     @Then("debería ver las cosechas publicadas por el agricultor")
     public void validaCosechasPublicadasEnCatalogo() {
-        // El catálogo carga las cosechas después de abrir la página (máximo 10 s, sigue apenas aparezcan)
-        testActor.attemptsTo(
-                WaitUntil.the(CatalogoUI.LISTA_PRODUCTOS, isVisible()).forNoMoreThan(10).seconds()
-        );
-
+        // El catálogo carga las cosechas después de abrir la página (máximo 10 s por cosecha, sigue apenas aparezca)
         for (DatosCosecha cosecha : CosechasRegistradas.obtenerTodas()) {
             testActor.should(
-                    seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosecha)))
+                    eventually(seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosecha)), equalTo(true))
+                            .orComplainWith(CosechaNoVisibleException.class,
+                                    CosechaNoVisibleException.MENSAJE + ": " + cosecha.getDescripcion()))
+                            .waitingForNoLongerThan(10).seconds()
             );
         }
     }
@@ -217,6 +230,7 @@ public class PublicarCosecha {
         // Se usa después de "debería ver las cosechas publicadas por el agricultor", que ya esperó a que cargara el catálogo
         testActor.should(
                 seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(CosechasRegistradas.obtenerRechazada())), equalTo(false))
+                        .orComplainWith(RechazoNoAplicadoException.class, RechazoNoAplicadoException.MENSAJE)
         );
     }
 
@@ -231,6 +245,7 @@ public class PublicarCosecha {
     public void noSeDebeRenderizar() {
         testActor.should(
                 seeThat(the(PerfilUI.BTN_PUBLICAR_COSECHA), isNotPresent())
+                        .orComplainWith(AccesoNoRestringidoException.class, AccesoNoRestringidoException.MENSAJE)
         );
     }
 }

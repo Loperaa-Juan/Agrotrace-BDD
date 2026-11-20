@@ -1,5 +1,7 @@
 package models;
 
+import exceptions.RecorridoIncompletoException;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,8 +23,8 @@ public class UsuariosRegistrados {
     public static UsuarioRegistro obtener(String tipo) {
         UsuarioRegistro usuario = usuarios.get(tipo);
         if (usuario == null) {
-            throw new IllegalStateException("No hay un usuario '" + tipo
-                    + "' registrado en esta ejecución. Ejecuta el feature completo.");
+            throw new RecorridoIncompletoException("No hay un usuario '" + tipo
+                    + "' registrado en esta ejecución.");
         }
         return usuario;
     }

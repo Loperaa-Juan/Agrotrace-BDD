@@ -1,4 +1,7 @@
 package stepsDefinitions;
+import exceptions.MensajeDeErrorNoMostradoException;
+import exceptions.RedireccionIncorrectaException;
+import exceptions.ValorDelFeatureNoValidoException;
 import interaction.NavigateTo;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
@@ -9,6 +12,7 @@ import net.serenitybdd.annotations.Managed;
 import net.serenitybdd.screenplay.abilities.BrowseTheWeb;
 import net.serenitybdd.screenplay.actions.Click;
 import net.serenitybdd.screenplay.waits.WaitUntil;
+import static net.serenitybdd.screenplay.EventualConsequence.eventually;
 import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static net.serenitybdd.screenplay.questions.WebElementQuestion.the;
 import static net.serenitybdd.screenplay.matchers.WebElementStateMatchers.containsText;
@@ -55,13 +59,20 @@ public class RegistroUsuario {
     @Then("Ve mensajes de campos obligatorios")
     public void validaCamposFaltantes() throws InterruptedException {
         testActor.should(
-                seeThat(ElementoPresente.en(RegistroUI.MSG_NOMBRE_OBLIGATORIO)),
-                seeThat(ElementoPresente.en(RegistroUI.MSG_NUMERO_DOCUMENTO_OBLIGATORIO)),
-                seeThat(ElementoPresente.en(RegistroUI.MSG_CORREO_OBLIGATORIO)),
-                seeThat(ElementoPresente.en(RegistroUI.MSG_TELEFONO_OBLIGATORIO)),
-                seeThat(ElementoPresente.en(RegistroUI.MSG_CONTRASENA_OBLIGATORIA)),
-                seeThat(ElementoPresente.en(RegistroUI.MSG_DIRECCION_OBLIGATORIA)),
-                seeThat(ElementoPresente.en(RegistroUI.MSG_MUNICIPIO_OBLIGATORIO))
+                seeThat(ElementoPresente.en(RegistroUI.MSG_NOMBRE_OBLIGATORIO), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE),
+                seeThat(ElementoPresente.en(RegistroUI.MSG_NUMERO_DOCUMENTO_OBLIGATORIO), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE),
+                seeThat(ElementoPresente.en(RegistroUI.MSG_CORREO_OBLIGATORIO), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE),
+                seeThat(ElementoPresente.en(RegistroUI.MSG_TELEFONO_OBLIGATORIO), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE),
+                seeThat(ElementoPresente.en(RegistroUI.MSG_CONTRASENA_OBLIGATORIA), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE),
+                seeThat(ElementoPresente.en(RegistroUI.MSG_DIRECCION_OBLIGATORIA), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE),
+                seeThat(ElementoPresente.en(RegistroUI.MSG_MUNICIPIO_OBLIGATORIO), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE)
         );
     }
 
@@ -76,7 +87,7 @@ public class RegistroUsuario {
         UsuarioRegistro usuario = DatosUsuarios.nuevo(tipo);
         // Se guarda para los tests siguientes del recorrido (correo / NIT repetido)
         UsuariosRegistrados.guardar(tipo, usuario);
-        Target botonRol = BOTON_POR_ROL.get(tipo);
+        Target botonRol = botonDe(tipo);
 
         testActor.attemptsTo(
                 Click.on(botonRol),
@@ -88,11 +99,10 @@ public class RegistroUsuario {
     @Then("Es redirigido a su perfil")
     public void validaRedireccionAPerfil() {
         // Espera a que cargue el perfil (máximo 10 s, sigue apenas aparezca)
-        testActor.attemptsTo(
-                WaitUntil.the(PerfilUI.CONTENEDOR_PERFIL, isPresent()).forNoMoreThan(10).seconds()
-        );
         testActor.should(
-                seeThat(ElementoPresente.en(PerfilUI.CONTENEDOR_PERFIL))
+                eventually(seeThat(ElementoPresente.en(PerfilUI.CONTENEDOR_PERFIL), equalTo(true))
+                        .orComplainWith(RedireccionIncorrectaException.class, RedireccionIncorrectaException.MENSAJE))
+                        .waitingForNoLongerThan(10).seconds()
         );
     }
 
@@ -100,6 +110,7 @@ public class RegistroUsuario {
     public void validaRol(String rol) {
         testActor.should(
                 seeThat(TextoElemento.de(PerfilUI.TXT_ROL), equalTo(rol))
+                        .orComplainWith(RedireccionIncorrectaException.class, RedireccionIncorrectaException.MENSAJE)
         );
     }
 
@@ -131,16 +142,21 @@ public class RegistroUsuario {
     @Then("Valida el mensaje {string}")
     public void validaErrorEnCampoEmail(String error) {
         testActor.should(
-                seeThat(ElementoPresente.en(RegistroUI.MSG_CORREO_OBLIGATORIO)),
+                seeThat(ElementoPresente.en(RegistroUI.MSG_CORREO_OBLIGATORIO), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE),
                 seeThat(the(RegistroUI.MSG_CORREO_OBLIGATORIO), containsText(error))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE)
         );
     }
 
     // ESCENARIO: Registro exitoso de un negocio
     @Then("Ve la lista de cosechas disponibles en la plataforma")
     public void validaLaListaDeProductosDisponibles() {
+        // Espera a que cargue el catálogo (máximo 10 s, sigue apenas aparezca)
         testActor.should(
-                seeThat(ElementoPresente.en(CatalogoUI.LISTA_PRODUCTOS))
+                eventually(seeThat(ElementoPresente.en(CatalogoUI.LISTA_PRODUCTOS), equalTo(true))
+                        .orComplainWith(RedireccionIncorrectaException.class, RedireccionIncorrectaException.MENSAJE))
+                        .waitingForNoLongerThan(10).seconds()
         );
     }
 
@@ -149,7 +165,7 @@ public class RegistroUsuario {
     public void intentaRegistrarseConNitDuplicado(String tipo) {
         String emailUltimoNegocioRegistrado = UsuariosRegistrados.obtener(tipo).getNumeroDocumento();
         UsuarioRegistro nuevoNegocioConMismoNit = DatosUsuarios.nuevoConDocumento(tipo, emailUltimoNegocioRegistrado);
-        Target botonRol = BOTON_POR_ROL.get(tipo);
+        Target botonRol = botonDe(tipo);
 
         testActor.attemptsTo(
                 Click.on(botonRol),
@@ -161,8 +177,10 @@ public class RegistroUsuario {
     @Then("Ve el mensaje {string}")
     public void validaErrorEnElCampoNit(String error) {
         testActor.should(
-                seeThat(ElementoPresente.en(RegistroUI.MSG_NUMERO_DOCUMENTO_OBLIGATORIO)),
+                seeThat(ElementoPresente.en(RegistroUI.MSG_NUMERO_DOCUMENTO_OBLIGATORIO), equalTo(true))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE),
                 seeThat(the(RegistroUI.MSG_NUMERO_DOCUMENTO_OBLIGATORIO), containsText(error))
+                        .orComplainWith(MensajeDeErrorNoMostradoException.class, MensajeDeErrorNoMostradoException.MENSAJE)
         );
     }
 
@@ -174,10 +192,20 @@ public class RegistroUsuario {
         UsuarioRegistro usuarioConCorreoInvalido = DatosUsuarios.nuevoConCorreo(tipo, correo);
 
         testActor.attemptsTo(
-                Click.on(BOTON_POR_ROL.get(tipo)),
+                Click.on(botonDe(tipo)),
                 LlenarDatosRegistroTask.con(usuarioConCorreoInvalido),
                 Click.on(RegistroUI.BTN_CREAR_PERFIL)
         );
+    }
+
+    // Botón del tipo de registro; si el feature trae un rol que no existe, falla con un mensaje claro
+    private Target botonDe(String tipo) {
+        Target boton = BOTON_POR_ROL.get(tipo);
+        if (boton == null) {
+            throw new ValorDelFeatureNoValidoException("No hay registro para el rol '" + tipo
+                    + "'. Usa \"agricultor\", \"persona\" o \"negocio\".");
+        }
+        return boton;
     }
 
 }

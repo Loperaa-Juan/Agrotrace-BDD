@@ -1,5 +1,8 @@
 package stepsDefinitions;
 
+import exceptions.CosechaNoVisibleException;
+import exceptions.FiltroIncorrectoException;
+import exceptions.ValorDelFeatureNoValidoException;
 import interaction.MoverDeslizador;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
@@ -26,6 +29,7 @@ import userInterface.PerfilUI;
 import java.util.List;
 import java.util.Map;
 
+import static net.serenitybdd.screenplay.EventualConsequence.eventually;
 import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
 import static net.serenitybdd.screenplay.matchers.WebElementStateMatchers.containsText;
 import static net.serenitybdd.screenplay.questions.WebElementQuestion.the;
@@ -71,7 +75,7 @@ public class AplicarFiltros {
                     InteractuarFiltrosTask.marcar(FiltrosUI.CHECKBOX_CALIDAD_B, FiltrosUI.ESTADO_CALIDAD_B),
                     InteractuarFiltrosTask.desmarcar(FiltrosUI.CHECKBOX_CALIDAD_A, FiltrosUI.ESTADO_CALIDAD_A)
             );
-            default -> throw new IllegalArgumentException("No hay filtro para '" + calidad
+            default -> throw new ValorDelFeatureNoValidoException("No hay filtro para '" + calidad
                     + "'. Usa \"calidad A\" o \"calidad B\".");
         }
     }
@@ -82,12 +86,17 @@ public class AplicarFiltros {
         DatosCosecha cosechaEsperada = CosechasRegistradas.obtener(calidad);
 
         // Espera a que se pinte la cosecha publicada con esa calidad (máximo 10 s, sigue apenas aparezca)
-        testActor.attemptsTo(
-                WaitUntil.the(CatalogoUI.tarjetaDe(cosechaEsperada), isVisible()).forNoMoreThan(10).seconds()
+        testActor.should(
+                eventually(seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosechaEsperada)), equalTo(true))
+                        .orComplainWith(FiltroIncorrectoException.class,
+                                FiltroIncorrectoException.MENSAJE + ": no aparece la cosecha de " + calidad))
+                        .waitingForNoLongerThan(10).seconds()
         );
         // Ninguna de las tarjetas que se ven puede tener otra calidad
         testActor.should(
                 seeThat(ElementoPresente.en(CatalogoUI.TARJETA_OTRA_CALIDAD.of(calidad)), equalTo(false))
+                        .orComplainWith(FiltroIncorrectoException.class,
+                                FiltroIncorrectoException.MENSAJE + ": aparecen cosechas con una calidad distinta de " + calidad)
         );
     }
 
@@ -97,6 +106,9 @@ public class AplicarFiltros {
 
         testActor.should(
                 seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosechaExcluida)), equalTo(false))
+                        .orComplainWith(FiltroIncorrectoException.class,
+                                FiltroIncorrectoException.MENSAJE + ": aparece la cosecha de " + cosechaExcluida.getProducto()
+                                        + " con calidad " + grado)
         );
     }
 
@@ -124,11 +136,11 @@ public class AplicarFiltros {
     @Then("debería ver la cosecha de ese producto en los resultados")
     public void validaExistenciaDelProducto() {
         // Espera a que la búsqueda pinte la tarjeta de la cosecha buscada (máximo 10 s, sigue apenas aparezca)
-        testActor.attemptsTo(
-                WaitUntil.the(CatalogoUI.tarjetaDe(cosechaBuscada), isVisible()).forNoMoreThan(10).seconds()
-        );
         testActor.should(
-                seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosechaBuscada)))
+                eventually(seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosechaBuscada)), equalTo(true))
+                        .orComplainWith(CosechaNoVisibleException.class,
+                                CosechaNoVisibleException.MENSAJE + ": " + cosechaBuscada.getDescripcion()))
+                        .waitingForNoLongerThan(10).seconds()
         );
     }
 
@@ -144,6 +156,7 @@ public class AplicarFiltros {
     public void validaMensajeError(String error) {
         testActor.should(
                 seeThat(the(FiltrosUI.TXT_RESULTADO_FILTRO), containsText(error))
+                        .orComplainWith(FiltroIncorrectoException.class, FiltroIncorrectoException.MENSAJE)
         );
     }
 
@@ -186,6 +199,8 @@ public class AplicarFiltros {
 
         testActor.should(
                 seeThat("los precios de las cosechas visibles", preciosVisibles, everyItem(lessThanOrEqualTo(precioLimite)))
+                        .orComplainWith(FiltroIncorrectoException.class,
+                                FiltroIncorrectoException.MENSAJE + ": aparecen cosechas con precio mayor a " + limite)
         );
     }
 
@@ -193,11 +208,11 @@ public class AplicarFiltros {
     public void validaQueAparecenLasCosechasPublicadas() {
         // Espera la tarjeta de cada cosecha publicada en esta ejecución (máximo 10 s, sigue apenas aparezca)
         for (DatosCosecha cosecha : CosechasRegistradas.obtenerTodas()) {
-            testActor.attemptsTo(
-                    WaitUntil.the(CatalogoUI.tarjetaDe(cosecha), isVisible()).forNoMoreThan(10).seconds()
-            );
             testActor.should(
-                    seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosecha)))
+                    eventually(seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosecha)), equalTo(true))
+                            .orComplainWith(CosechaNoVisibleException.class,
+                                    CosechaNoVisibleException.MENSAJE + ": " + cosecha.getDescripcion()))
+                            .waitingForNoLongerThan(10).seconds()
             );
         }
     }
@@ -209,6 +224,9 @@ public class AplicarFiltros {
         for (DatosCosecha cosecha : CosechasRegistradas.obtenerTodas()) {
             testActor.should(
                     seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(cosecha)), equalTo(false))
+                            .orComplainWith(FiltroIncorrectoException.class,
+                                    FiltroIncorrectoException.MENSAJE + ": aparece una cosecha que el filtro debía ocultar: "
+                                            + cosecha.getDescripcion())
             );
         }
     }
@@ -223,7 +241,7 @@ public class AplicarFiltros {
     private String calidadDe(String grado) {
         String calidad = CALIDAD_POR_GRADO.get(grado);
         if (calidad == null) {
-            throw new IllegalArgumentException("No hay calidad para el grado '" + grado + "'. Usa \"A\" o \"B\".");
+            throw new ValorDelFeatureNoValidoException("No hay calidad para el grado '" + grado + "'. Usa \"A\" o \"B\".");
         }
         return calidad;
     }
