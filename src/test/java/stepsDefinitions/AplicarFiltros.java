@@ -53,7 +53,7 @@ public class AplicarFiltros {
     public void setStage(){testActor = Actor.named("Usuario").can(BrowseTheWeb.with(driver));}
 
     @Given("El negocio entra a la página de busqueda por filtros")
-    public void IngresaALaPaginaDeFiltros() {
+    public void ingresaALaPaginaDeFiltros() {
         testActor.attemptsTo(
                 Click.on(PerfilUI.BTN_FILTROS_BUSQUEDA)
         );
@@ -77,7 +77,7 @@ public class AplicarFiltros {
     }
 
     @Then("debería ver solo cosechas de calidad {string}")
-    public void ValidaSoloCosechasDeCalidad(String grado) {
+    public void validaSoloCosechasDeCalidad(String grado) {
         String calidad = calidadDe(grado);
         DatosCosecha cosechaEsperada = CosechasRegistradas.obtener(calidad);
 
@@ -92,7 +92,7 @@ public class AplicarFiltros {
     }
 
     @And("no debería ver la cosecha de calidad {string}")
-    public void ValidaQueNoApareceCosechaDeCalidad(String grado) {
+    public void validaQueNoApareceCosechaDeCalidad(String grado) {
         DatosCosecha cosechaExcluida = CosechasRegistradas.obtener(calidadDe(grado));
 
         testActor.should(
@@ -101,7 +101,7 @@ public class AplicarFiltros {
     }
 
     @Given("El negocio limpia los filtros de calidad")
-    public void LimpiaFiltrosDeCalidad() {
+    public void limpiaFiltrosDeCalidad() {
         // Deja marcadas todas las calidades (como al abrir la página) para que el filtro no oculte resultados
         testActor.attemptsTo(
                 InteractuarFiltrosTask.marcar(FiltrosUI.CHECKBOX_CALIDAD_A, FiltrosUI.ESTADO_CALIDAD_A),
@@ -110,19 +110,19 @@ public class AplicarFiltros {
     }
 
     @When("busca el último producto publicado por el agricultor con {string}")
-    public void BuscaUltimoProductoConCalidad(String calidad) {
+    public void buscaUltimoProductoConCalidad(String calidad) {
 
         cosechaBuscada = CosechasRegistradas.obtener(calidadDe(calidad.replace("calidad ", "")));
-        String UltimoProductoPublicado = cosechaBuscada.getProducto();
+        String ultimoProductoPublicado = cosechaBuscada.getProducto();
 
         testActor.attemptsTo(
-                Enter.theValue(UltimoProductoPublicado).into(FiltrosUI.INPUT_BUSCAR_PRODUCTO),
+                Enter.theValue(ultimoProductoPublicado).into(FiltrosUI.INPUT_BUSCAR_PRODUCTO),
                 Click.on(FiltrosUI.BTN_BUSCAR)
         );
     }
 
     @Then("debería ver la cosecha de ese producto en los resultados")
-    public void ValidaExistenciaDelProducto() {
+    public void validaExistenciaDelProducto() {
         // Espera a que la búsqueda pinte la tarjeta de la cosecha buscada (máximo 10 s, sigue apenas aparezca)
         testActor.attemptsTo(
                 WaitUntil.the(CatalogoUI.tarjetaDe(cosechaBuscada), isVisible()).forNoMoreThan(10).seconds()
@@ -133,7 +133,7 @@ public class AplicarFiltros {
     }
 
     @When("busca el producto {string}")
-    public void BuscaProductoPorNombre(String producto) {
+    public void buscaProductoPorNombre(String producto) {
         testActor.attemptsTo(
                 Enter.theValue(producto).into(FiltrosUI.INPUT_BUSCAR_PRODUCTO),
                 Click.on(FiltrosUI.BTN_BUSCAR)
@@ -141,14 +141,14 @@ public class AplicarFiltros {
     }
 
     @Then("debería ver el mensaje {string}")
-    public void ValidaMensajeError(String error) {
+    public void validaMensajeError(String error) {
         testActor.should(
                 seeThat(the(FiltrosUI.TXT_RESULTADO_FILTRO), containsText(error))
         );
     }
 
     @Given("el negocio limpia la búsqueda anterior")
-    public void LimpiaBusquedaAnterior() {
+    public void limpiaBusquedaAnterior() {
         // La app no deja buscar con el input vacío (el botón Enviar se desactiva),
         // así que se recarga la página de filtros: vuelve sin búsqueda, con A y B marcados y el precio por defecto.
         // La sesión se mantiene porque la app la guarda en localStorage.
@@ -158,7 +158,7 @@ public class AplicarFiltros {
     }
 
     @When("filtra las cosechas con precio hasta {string} pesos")
-    public void AjustaPrecioHasta(String limite) {
+    public void ajustaPrecioHasta(String limite) {
         int precioLimite = Integer.parseInt(limite);
 
         testActor.attemptsTo(
@@ -171,7 +171,7 @@ public class AplicarFiltros {
     }
 
     @Then("debería ver solo cosechas con precio hasta {string} pesos")
-    public void ValidaPreciosHastaElLimite(String limite) {
+    public void validaPreciosHastaElLimite(String limite) {
         double precioLimite = Double.parseDouble(limite);
 
         // Espera a que la página cargue las cosechas (máximo 10 s): con la lista vacía no habría precios que revisar
@@ -190,7 +190,7 @@ public class AplicarFiltros {
     }
 
     @Then("debería ver las cosechas publicadas en los resultados")
-    public void ValidaQueAparecenLasCosechasPublicadas() {
+    public void validaQueAparecenLasCosechasPublicadas() {
         // Espera la tarjeta de cada cosecha publicada en esta ejecución (máximo 10 s, sigue apenas aparezca)
         for (DatosCosecha cosecha : CosechasRegistradas.obtenerTodas()) {
             testActor.attemptsTo(
@@ -203,7 +203,7 @@ public class AplicarFiltros {
     }
 
     @And("no debería ver las cosechas publicadas en los resultados")
-    public void ValidaQueNoAparecenLasCosechasPublicadas() {
+    public void validaQueNoAparecenLasCosechasPublicadas() {
         // Las cosechas publicadas en esta ejecución cuestan 5000: con un límite menor el filtro las debe ocultar.
         // Se usa después de "debería ver solo cosechas con precio hasta…", que ya esperó a que cargaran las cosechas.
         for (DatosCosecha cosecha : CosechasRegistradas.obtenerTodas()) {

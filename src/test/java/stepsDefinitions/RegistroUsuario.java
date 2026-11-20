@@ -39,12 +39,12 @@ public class RegistroUsuario {
     public void setStage(){testActor = Actor.named("Usuario").can(BrowseTheWeb.with(driver));}
 
     @Given("Un nuevo usuario se encuentra en la página de registro")
-    public void IngresaPaginaRegistro() throws InterruptedException {
+    public void ingresaPaginaRegistro() throws InterruptedException {
         testActor.attemptsTo(NavigateTo.page());
     }
 
     @When("Intenta registrarse sin diligenciar los campos obligatorios")
-    public void IngresarDatosAFormulario() {
+    public void ingresarDatosAFormulario() {
         testActor.attemptsTo(
                 Click.on(RegistroUI.BTN_CREAR_PERFIL),
                 // Espera a que el formulario muestre los errores (máximo 10 s, sigue apenas aparezcan)
@@ -53,7 +53,7 @@ public class RegistroUsuario {
     }
 
     @Then("Ve mensajes de campos obligatorios")
-    public void ValidaCamposFaltantes() throws InterruptedException {
+    public void validaCamposFaltantes() throws InterruptedException {
         testActor.should(
                 seeThat(ElementoPresente.en(RegistroUI.MSG_NOMBRE_OBLIGATORIO)),
                 seeThat(ElementoPresente.en(RegistroUI.MSG_NUMERO_DOCUMENTO_OBLIGATORIO)),
@@ -72,7 +72,7 @@ public class RegistroUsuario {
     );
 
     @When("Se registra como {string} con datos válidos")
-    public void SeRegistraComo(String tipo) {
+    public void seRegistraComo(String tipo) {
         UsuarioRegistro usuario = DatosUsuarios.nuevo(tipo);
         // Se guarda para los tests siguientes del recorrido (correo / NIT repetido)
         UsuariosRegistrados.guardar(tipo, usuario);
@@ -86,7 +86,7 @@ public class RegistroUsuario {
     }
 
     @Then("Es redirigido a su perfil")
-    public void ValidaRedireccionAPerfil() {
+    public void validaRedireccionAPerfil() {
         // Espera a que cargue el perfil (máximo 10 s, sigue apenas aparezca)
         testActor.attemptsTo(
                 WaitUntil.the(PerfilUI.CONTENEDOR_PERFIL, isPresent()).forNoMoreThan(10).seconds()
@@ -97,14 +97,14 @@ public class RegistroUsuario {
     }
 
     @Then("Valida su rol de {string}")
-    public void ValidaRol(String rol) {
+    public void validaRol(String rol) {
         testActor.should(
                 seeThat(TextoElemento.de(PerfilUI.TXT_ROL), equalTo(rol))
         );
     }
 
     @Then("Cierra sesión")
-    public void CierraSesion() {
+    public void cierraSesion() {
         testActor.attemptsTo(
                 Click.on(PerfilUI.BTN_MENU),
                 Click.on(PerfilUI.BTN_CERRAR_SESION)
@@ -112,24 +112,24 @@ public class RegistroUsuario {
     }
 
     @Given("Cierra sesión y vuelve a la página de registro")
-    public void CierraSesionYVuelveARegistro() {
-        CierraSesion();
+    public void cierraSesionYVuelveARegistro() {
+        cierraSesion();
         testActor.attemptsTo(Click.on(RegistroUI.BTN_REGISTRARSE));
     }
 
     @When("Intenta registrarse con el correo del {string} recién registrado")
-    public void IntentaRegistrarseConEmailDuplicado(String tipo) {
-        String EmailUltimoUsuarioRegistrado = UsuariosRegistrados.obtener(tipo).getCorreo();
-        UsuarioRegistro NuevoUsuarioConMismoEmail = DatosUsuarios.nuevoConCorreo(tipo, EmailUltimoUsuarioRegistrado);
+    public void intentaRegistrarseConEmailDuplicado(String tipo) {
+        String emailUltimoUsuarioRegistrado = UsuariosRegistrados.obtener(tipo).getCorreo();
+        UsuarioRegistro nuevoUsuarioConMismoEmail = DatosUsuarios.nuevoConCorreo(tipo, emailUltimoUsuarioRegistrado);
 
         testActor.attemptsTo(
-                LlenarDatosRegistroTask.con(NuevoUsuarioConMismoEmail),
+                LlenarDatosRegistroTask.con(nuevoUsuarioConMismoEmail),
                 Click.on(RegistroUI.BTN_CREAR_PERFIL)
         );
     }
 
     @Then("Valida el mensaje {string}")
-    public void ValidaErrorEnCampoEmail(String error) {
+    public void validaErrorEnCampoEmail(String error) {
         testActor.should(
                 seeThat(ElementoPresente.en(RegistroUI.MSG_CORREO_OBLIGATORIO)),
                 seeThat(the(RegistroUI.MSG_CORREO_OBLIGATORIO), containsText(error))
@@ -138,7 +138,7 @@ public class RegistroUsuario {
 
     // ESCENARIO: Registro exitoso de un negocio
     @Then("Ve la lista de cosechas disponibles en la plataforma")
-    public void ValidaLaListaDeProductosDisponibles() {
+    public void validaLaListaDeProductosDisponibles() {
         testActor.should(
                 seeThat(ElementoPresente.en(CatalogoUI.LISTA_PRODUCTOS))
         );
@@ -146,20 +146,20 @@ public class RegistroUsuario {
 
     // ESCENARIO: Un negocio intenta registrarse con el NIT del negocio recién registrado
     @When("Intenta registrarse como {string} con el NIT del negocio recién registrado")
-    public void IntentaRegistrarseConNITDuplicado(String tipo) {
-        String EmailUltimoNegocioRegistrado = UsuariosRegistrados.obtener(tipo).getNumeroDocumento();
-        UsuarioRegistro NuevoNegocioConMismoNIT = DatosUsuarios.nuevoConDocumento(tipo, EmailUltimoNegocioRegistrado);
+    public void intentaRegistrarseConNitDuplicado(String tipo) {
+        String emailUltimoNegocioRegistrado = UsuariosRegistrados.obtener(tipo).getNumeroDocumento();
+        UsuarioRegistro nuevoNegocioConMismoNit = DatosUsuarios.nuevoConDocumento(tipo, emailUltimoNegocioRegistrado);
         Target botonRol = BOTON_POR_ROL.get(tipo);
 
         testActor.attemptsTo(
                 Click.on(botonRol),
-                LlenarDatosRegistroTask.con(NuevoNegocioConMismoNIT),
+                LlenarDatosRegistroTask.con(nuevoNegocioConMismoNit),
                 Click.on(RegistroUI.BTN_CREAR_PERFIL)
         );
     }
 
     @Then("Ve el mensaje {string}")
-    public void ValidaErrorEnElCampoNIT(String error) {
+    public void validaErrorEnElCampoNit(String error) {
         testActor.should(
                 seeThat(ElementoPresente.en(RegistroUI.MSG_NUMERO_DOCUMENTO_OBLIGATORIO)),
                 seeThat(the(RegistroUI.MSG_NUMERO_DOCUMENTO_OBLIGATORIO), containsText(error))
@@ -168,14 +168,14 @@ public class RegistroUsuario {
 
     // ESCENARIO: Un usuario intenta registrarse con un correo con formato inválido
     @When("Intenta registrarse como {string} con el correo {string}")
-    public void IntentaRegistrarseConCorreoInvalido(String tipo, String correo) {
+    public void intentaRegistrarseConCorreoInvalido(String tipo, String correo) {
         // Datos válidos excepto el correo, que llega desde el feature.
         // No se guarda en UsuariosRegistrados: este usuario no llega a registrarse.
-        UsuarioRegistro UsuarioConCorreoInvalido = DatosUsuarios.nuevoConCorreo(tipo, correo);
+        UsuarioRegistro usuarioConCorreoInvalido = DatosUsuarios.nuevoConCorreo(tipo, correo);
 
         testActor.attemptsTo(
                 Click.on(BOTON_POR_ROL.get(tipo)),
-                LlenarDatosRegistroTask.con(UsuarioConCorreoInvalido),
+                LlenarDatosRegistroTask.con(usuarioConCorreoInvalido),
                 Click.on(RegistroUI.BTN_CREAR_PERFIL)
         );
     }

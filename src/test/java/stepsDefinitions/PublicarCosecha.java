@@ -49,23 +49,23 @@ public class PublicarCosecha {
     public void setStage(){testActor = Actor.named("Usuario").can(BrowseTheWeb.with(driver));}
 
     @Given("El {string} registrado anteriormente inicia sesión")
-    public void IniciaSesionComo(String rol) {
+    public void iniciaSesionComo(String rol) {
         // Extraemos el email y la contraseña del último agricultor que se registró
-        String EmailUltimoAgricultorRegistrado = UsuariosRegistrados.obtener(rol).getCorreo();
-        String ContrasenaUltimoAgricultorRegistrado = UsuariosRegistrados.obtener(rol).getContrasena();
-        CredencialesLogin UsuarioALoguear = new CredencialesLogin(
-                EmailUltimoAgricultorRegistrado,
-                ContrasenaUltimoAgricultorRegistrado
+        String emailUltimoAgricultorRegistrado = UsuariosRegistrados.obtener(rol).getCorreo();
+        String contrasenaUltimoAgricultorRegistrado = UsuariosRegistrados.obtener(rol).getContrasena();
+        CredencialesLogin usuarioALoguear = new CredencialesLogin(
+                emailUltimoAgricultorRegistrado,
+                contrasenaUltimoAgricultorRegistrado
         );
 
         testActor.attemptsTo(
-                LlenarDatosLoginTask.con(UsuarioALoguear),
+                LlenarDatosLoginTask.con(usuarioALoguear),
                 Click.on(LoginUI.LOGIN_BUTTON)
         );
     }
 
     @When("Intenta publicar una cosecha sin los campos obligatorios")
-    public void IntentaPublicarCosechaSinCampos() {
+    public void intentaPublicarCosechaSinCampos() {
         testActor.attemptsTo(
                 Click.on(PerfilUI.BTN_PUBLICAR_COSECHA),
                 Click.on(PublicarOfertaUI.BTN_SIGUIENTE)
@@ -73,7 +73,7 @@ public class PublicarCosecha {
     }
 
     @Then("Ve mensajes de error por los campos obligatorios faltantes")
-    public void ValidaMensajesDeCamposFaltantes() {
+    public void validaMensajesDeCamposFaltantes() {
         testActor.should(
                 seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_PRODUCTO)),
                 seeThat(ElementoPresente.en(PublicarOfertaUI.MSG_ERROR_CANTIDAD)),
@@ -83,7 +83,7 @@ public class PublicarCosecha {
     }
 
     @When("Intenta continuar con cantidad {string} y precio {string}")
-    public void IntentaContinuarConCantidadYPrecio(String cantidad, String precio) {
+    public void intentaContinuarConCantidadYPrecio(String cantidad, String precio) {
         testActor.attemptsTo(
                 Enter.theValue(cantidad).into(PublicarOfertaUI.INPUT_CANTIDAD),
                 Enter.theValue(precio).into(PublicarOfertaUI.INPUT_PRECIO),
@@ -93,21 +93,21 @@ public class PublicarCosecha {
 
     // El mensaje de error trae un ícono que se lee como texto ("error"), por eso se valida con containsText
     @Then("Debería ver el error de cantidad {string}")
-    public void ValidaErrorDeCantidad(String mensaje) {
+    public void validaErrorDeCantidad(String mensaje) {
         testActor.should(
                 seeThat(the(PublicarOfertaUI.MSG_ERROR_CANTIDAD), containsText(mensaje))
         );
     }
 
     @And("Debería ver el error de precio {string}")
-    public void ValidaErrorDePrecio(String mensaje) {
+    public void validaErrorDePrecio(String mensaje) {
         testActor.should(
                 seeThat(the(PublicarOfertaUI.MSG_ERROR_PRECIO), containsText(mensaje))
         );
     }
 
     @When("Publica una cosecha de {string} con datos validos y la imagen {string}")
-    public void PublicaCosechaConCamposValidos(String producto, String imagen) {
+    public void publicaCosechaConCamposValidos(String producto, String imagen) {
         DatosCosecha cosecha = DatosCosechas.nueva(producto, imagen);
         cosechaEnPublicacion = cosecha;
 
@@ -118,7 +118,7 @@ public class PublicarCosecha {
     }
 
     @Then("La cosecha debería ser clasificada con {string}")
-    public void ValidaCalidadAsignadaDeCosecha(String calidad) {
+    public void validaCalidadAsignadaDeCosecha(String calidad) {
         testActor.should(
                 seeThat(TextoElemento.de(PublicarOfertaUI.TXT_CALIDAD_IA), equalTo(calidad))
         );
@@ -126,7 +126,7 @@ public class PublicarCosecha {
     }
 
     @And("debería ver el mensaje de {string}")
-    public void ValidaCosechaPublicada(String mensaje) {
+    public void validaCosechaPublicada(String mensaje) {
         testActor.should(
                 seeThat(TextoElemento.de(PublicarOfertaUI.MSG_COSECHA_PUBLICADA), equalTo(mensaje))
         );
@@ -139,21 +139,21 @@ public class PublicarCosecha {
     }
 
     @Given("El agricultor se encuentra en el formulario de publicación")
-    public void IngresaAlFormularioDePublicacion() {
+    public void ingresaAlFormularioDePublicacion() {
         testActor.attemptsTo(
                 Click.on(PerfilUI.BTN_PUBLICAR_COSECHA)
         );
     }
 
     @Then("Se debe mostar el mensaje de {string}")
-    public void ValidaAlertaDeCosechaRechazada(String mensaje) {
+    public void validaAlertaDeCosechaRechazada(String mensaje) {
         testActor.should(
                 seeThat(TextoElemento.de(PublicarOfertaUI.MSG_ALERTA_ERROR), equalTo(mensaje))
         );
     }
 
     @And("El botón para publicar la cosecha debe estar desactivado")
-    public void ValidaBotonPublicarDesactivado() {
+    public void validaBotonPublicarDesactivado() {
         testActor.should(
                 seeThat(the(PublicarOfertaUI.BTN_PUBLICAR_COSECHA), isNotEnabled())
         );
@@ -162,7 +162,7 @@ public class PublicarCosecha {
     }
 
     @Given("El agricultor vuelve a la primera vista del formulario de publicación")
-    public void VuelveALaPrimeraVistaDelFormulario() {
+    public void vuelveALaPrimeraVistaDelFormulario() {
         testActor.attemptsTo(
                 Click.on(PublicarOfertaUI.BTN_VOLVER_REVISION),
                 Click.on(PublicarOfertaUI.BTN_VOLVER_DATOS)
@@ -170,7 +170,7 @@ public class PublicarCosecha {
     }
 
     @When("Intenta publicar una cosecha de {string} con datos validos y la imagen {string}")
-    public void IntentaPublicarCosechaConCamposValidos(String producto, String imagen) {
+    public void intentaPublicarCosechaConCamposValidos(String producto, String imagen) {
         // Llena el formulario sin publicar: si la imagen no tiene fruta, la app se queda en el paso 2
         DatosCosecha cosecha = DatosCosechas.nueva(producto, imagen);
 
@@ -180,7 +180,7 @@ public class PublicarCosecha {
     }
 
     @When("Intenta abrir el formulario de publicación")
-    public void IntentaAbrirFormularioDePublicacion() {
+    public void intentaAbrirFormularioDePublicacion() {
         // Abre /publicar directamente por URL, sin pasar por el menú
         testActor.attemptsTo(
                 Open.browserOn().the(PublicarOfertaUI.class)
@@ -188,7 +188,7 @@ public class PublicarCosecha {
     }
 
     @Then("Es redirigido al inicio de sesión")
-    public void ValidaRedireccionAlInicioDeSesion() {
+    public void validaRedireccionAlInicioDeSesion() {
         // La app redirige /publicar al login cuando no hay sesión (máximo 10 s, sigue apenas aparezca)
         testActor.attemptsTo(
                 WaitUntil.the(LoginUI.INPUT_EMAIL, isVisible()).forNoMoreThan(10).seconds()
@@ -199,7 +199,7 @@ public class PublicarCosecha {
     }
 
     @Then("debería ver las cosechas publicadas por el agricultor")
-    public void ValidaCosechasPublicadasEnCatalogo() {
+    public void validaCosechasPublicadasEnCatalogo() {
         // El catálogo carga las cosechas después de abrir la página (máximo 10 s, sigue apenas aparezcan)
         testActor.attemptsTo(
                 WaitUntil.the(CatalogoUI.LISTA_PRODUCTOS, isVisible()).forNoMoreThan(10).seconds()
@@ -213,7 +213,7 @@ public class PublicarCosecha {
     }
 
     @And("no debería ver la cosecha rechazada por la IA")
-    public void ValidaQueNoApareceLaCosechaRechazada() {
+    public void validaQueNoApareceLaCosechaRechazada() {
         // Se usa después de "debería ver las cosechas publicadas por el agricultor", que ya esperó a que cargara el catálogo
         testActor.should(
                 seeThat(ElementoPresente.en(CatalogoUI.tarjetaDe(CosechasRegistradas.obtenerRechazada())), equalTo(false))
@@ -221,7 +221,7 @@ public class PublicarCosecha {
     }
 
     @When("Despliega el menú de opciones del usuario")
-    public void DespliegaMenuDeUsuario() {
+    public void despliegaMenuDeUsuario() {
         testActor.attemptsTo(
                 Click.on(PerfilUI.BTN_MENU)
         );
