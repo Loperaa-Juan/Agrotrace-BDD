@@ -41,3 +41,8 @@ Feature: Filtros del catálogo de cosechas en AgroTrace
     Given el negocio limpia la búsqueda anterior
     When busca el producto "aguacate"
     Then debería ver las cosechas publicadas en los resultados
+
+  Scenario: Combinar la búsqueda por nombre con el filtro de calidad
+    When filtra las cosechas por "calidad A"
+    Then debería ver solo cosechas de calidad "A"
+    And no debería ver la cosecha de calidad "B"
