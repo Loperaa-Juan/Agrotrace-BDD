@@ -37,6 +37,11 @@ Feature: Publicación de cosechas en Agrotrace
     When Intenta abrir el formulario de publicación
     Then Es redirigido al inicio de sesión
 
+  Scenario: Una persona también ve las cosechas publicadas en el catálogo
+    When El "persona" registrado anteriormente inicia sesión
+    Then debería ver las cosechas publicadas por el agricultor
+    And Cierra sesión
+
   Scenario: Las cosechas publicadas son visibles en el catálogo
     When El "negocio" registrado anteriormente inicia sesión
     Then debería ver las cosechas publicadas por el agricultor
