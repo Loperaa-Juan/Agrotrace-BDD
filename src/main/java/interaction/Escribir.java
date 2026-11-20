@@ -6,6 +6,7 @@ import net.serenitybdd.screenplay.Tasks;
 import net.serenitybdd.screenplay.actions.Clear;
 import net.serenitybdd.screenplay.actions.Enter;
 import net.serenitybdd.screenplay.targets.Target;
+import utils.Pausas;
 import utils.Textos;
 
 // Escribe un valor en un campo del formulario. Si el valor viene vacío, limpia el campo.
@@ -35,6 +36,8 @@ public class Escribir implements Interaction {
         } else {
             actor.attemptsTo(Clear.field(campo));
         }
+        // Pausa corta para que el formulario se vea llenarse campo por campo
+        Pausas.despuesDeCampo();
     }
 
     // Guarda el valor mientras se indica el campo con en(...)
