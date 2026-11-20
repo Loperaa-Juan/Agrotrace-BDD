@@ -1,5 +1,6 @@
 package task;
 
+import interaction.Escribir;
 import models.DatosCosecha;
 import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Performable;
@@ -9,6 +10,7 @@ import net.serenitybdd.screenplay.actions.*;
 import net.serenitybdd.screenplay.targets.Target;
 import net.serenitybdd.screenplay.waits.WaitUntil;
 import userInterface.PublicarOfertaUI;
+import utils.Textos;
 
 import static net.serenitybdd.screenplay.matchers.WebElementStateMatchers.isVisible;
 
@@ -33,12 +35,14 @@ public class LlenarDatosCosechaTask implements Task {
     @Override
     public <T extends Actor> void performAs(T actor) {
         seleccionarProducto(actor, cosecha.getProducto());
-        escribir(actor, cosecha.getCantidad(), INPUT_CANTIDAD);
-        escribir(actor, cosecha.getPrecio(), INPUT_PRECIO);
-        cargarFoto(actor, cosecha.getFoto(), INPUT_FOTO);
-        escribir(actor, cosecha.getDescripcion(), INPUT_DESCRIPCION);
         actor.attemptsTo(
-            Click.on(PublicarOfertaUI.BTN_SIGUIENTE)
+                Escribir.elValor(cosecha.getCantidad()).en(INPUT_CANTIDAD),
+                Escribir.elValor(cosecha.getPrecio()).en(INPUT_PRECIO)
+        );
+        cargarFoto(actor, cosecha.getFoto(), INPUT_FOTO);
+        actor.attemptsTo(
+                Escribir.elValor(cosecha.getDescripcion()).en(INPUT_DESCRIPCION),
+                Click.on(PublicarOfertaUI.BTN_SIGUIENTE)
         );
         llenarFecha(actor, cosecha.getFechaCosecha(), INPUT_FECHA);
         // La IA tarda en clasificar la foto (el botón muestra "Revisando…").
@@ -50,21 +54,9 @@ public class LlenarDatosCosechaTask implements Task {
 
     }
 
-    private boolean tieneValor(String valor) {
-        return valor != null && !valor.isBlank();
-    }
-
     private void seleccionarProducto(Actor actor, String tipo) {
-        if(tieneValor(tipo)) {
+        if(Textos.tieneValor(tipo)) {
             actor.attemptsTo(SelectFromOptions.byVisibleText(tipo).from(SELECT_PRODUCTO));
-        }
-    }
-
-    private void escribir(Actor actor, String valor, Target campo) {
-        if(tieneValor(valor)) {
-            actor.attemptsTo(Enter.theValue(valor).into(campo));
-        } else {
-            actor.attemptsTo(Clear.field(campo));
         }
     }
 
@@ -77,9 +69,5 @@ public class LlenarDatosCosechaTask implements Task {
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("ddMMyyyy");
 
         actor.attemptsTo(Enter.theValue(fecha.format(formato)).into(campo));
-    }
-
-    private void escribir(Actor actor, Integer valor, Target campo) {
-        escribir(actor, valor == null ? null : String.valueOf(valor), campo);
     }
 }
