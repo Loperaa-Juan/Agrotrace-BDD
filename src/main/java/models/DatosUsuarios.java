@@ -22,7 +22,7 @@ public class DatosUsuarios {
                 unico,
                 tipo + "." + unico + "@prueba.com",
                 "3001234567",
-                "Clave123*",
+                "ClaveAgrotrace123*",
                 "Calle 38 Sur # 43-20",
                 "Envigado");
     }
