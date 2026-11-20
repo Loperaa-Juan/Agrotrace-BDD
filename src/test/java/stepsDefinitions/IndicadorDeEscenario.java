@@ -18,7 +18,6 @@ import java.nio.file.Paths;
 import java.util.List;
 
 // Muestra en la página un letrero con el feature y el escenario que se están ejecutando.
-// Sirve para seguir el recorrido encadenado en el navegador y aparece en las capturas de Serenity.
 public class IndicadorDeEscenario {
 
     @Managed
